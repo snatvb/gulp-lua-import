@@ -57,7 +57,6 @@ function loadFile (filePath) {
 //noinspection JSUnresolvedVariable
 module.exports = function (userOptions) {
   options = Object.assign(options, userOptions);
-  console.log(options);
   return through.obj(function (file, enc, callback) {
     if (file.isStream()) {
       file.contents = file.contents.pipe(rs(search, replacement));
