@@ -2,7 +2,7 @@
 Конфигурационный файл для сборки:
 ```sh
 const gulp = require('gulp');
-const luaImport = require('./index');
+const luaImport = require('gulp-lua-import');
 
 gulp.task('default', function () {
   return gulp.src('./test/**/*.lua')
