@@ -6,14 +6,19 @@
 const through = require('through2')
   , rs = require('replacestream')
   , gutil = require('gulp-util')
+  , path = require('path')
   , fs = require('fs');
 
-
-let options = {
-  pathDivider: '/',
-  log: true
+var logModuleLoaded = function (filePath, baseFileDir) {
+  if(options.log === false) {
+    return;
+  }
+  gutil.log('ModuleLoaded: ' + gutil.colors.cyan(filePath) + ' -> ' + gutil.colors.cyan(baseFileDir));
 };
 
+let options = {
+  log: true
+};
 const utils = {
   isModule: function (fileName) {
     return fileName.substr(0,8) === '_module_';
@@ -28,12 +33,6 @@ const utils = {
   },
   getModuleContent: function (moduleContent) {
     return '(function () \n' + moduleContent + '\n end)()';
-  },
-  getFileDir: function (filePath) {
-    if(!Array.isArray(filePath)) {
-      filePath = filePath.split(options.pathDivider);
-    }
-    return (filePath.slice(0, filePath.length - 1)).join(options.pathDivider);
   }
 };
 
@@ -42,19 +41,17 @@ function replacement (fileContent, baseFileDir) {
   let matches;
   while ((matches = pattern.exec(fileContent)) !== null) {
     const fileName = utils.getFileNameRequire(matches[0]);
-    const filePath = baseFileDir + options.pathDivider + fileName;
+    const filePath = path.join(baseFileDir, fileName)
     const moduleContent = loadFile(filePath);
     fileContent = fileContent.replace(matches[0], utils.getModuleContent(moduleContent));
-    if(options.log) {
-      console.log('ModuleLoaded: ' + filePath + ' -> ' + baseFileDir);
-    }
+    logModuleLoaded(filePath, baseFileDir);
   }
   return fileContent;
 }
 
 function loadFile (filePath) {
   const fileContent = fs.readFileSync(filePath, "utf8");
-  return replacement(fileContent, utils.getFileDir(filePath))
+  return replacement(fileContent, path.parse(filePath).dir)
 }
 
 
@@ -66,10 +63,9 @@ module.exports = function (userOptions) {
       file.contents = file.contents.pipe(rs(search, replacement));
       return callback(null, file);
     }
-
-    const filePath = file.path.split(options.pathDivider);
-    const fileName = filePath[filePath.length - 1];
-    const fileDir = utils.getFileDir(filePath);
+    const parseFile = path.parse(file.path);
+    const fileName = parseFile.base;
+    const fileDir = parseFile.dir;
 
     if(utils.isModule(fileName)) {
       return callback();
