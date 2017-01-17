@@ -3,9 +3,6 @@
  */
 
 const gulp = require('gulp');
-const replace = require('gulp-string-replace');
-const through2 = require('through2').obj;
-const fs = require('fs');
 const luaImport = require('./index');
 
 gulp.task('default', function () {
