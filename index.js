@@ -3,10 +3,15 @@
  */
 'use strict';
 
-var through = require('through2')
+const through = require('through2')
   , rs = require('replacestream')
   , gutil = require('gulp-util')
   , fs = require('fs');
+
+
+let options = {
+  pathDivider: '/'
+};
 
 const utils = {
   isModule: function (fileName) {
@@ -25,9 +30,9 @@ const utils = {
   },
   getFileDir: function (filePath) {
     if(!Array.isArray(filePath)) {
-      filePath = filePath.split('/');
+      filePath = filePath.split(options.pathDivider);
     }
-    return (filePath.slice(0, filePath.length - 1)).join('/');
+    return (filePath.slice(0, filePath.length - 1)).join(options.pathDivider);
   }
 };
 
@@ -37,7 +42,7 @@ function replacement (fileContent, baseFileDir) {
   // console.log(fileContent);
   while ((matches = pattern.exec(fileContent)) !== null) {
     const fileName = utils.getFileNameRequire(matches[0]);
-    const filePath = baseFileDir + '/' + fileName;
+    const filePath = baseFileDir + options.pathDivider + fileName;
     const moduleContent = loadFile(filePath);
     fileContent = fileContent.replace(matches[0], utils.getModuleContent(moduleContent));
   }
@@ -49,15 +54,18 @@ function loadFile (filePath) {
   return replacement(fileContent, utils.getFileDir(filePath))
 }
 
+
 //noinspection JSUnresolvedVariable
 module.exports = function (userOptions) {
+  options = Object.assign(options, userOptions);
+  console.log(options);
   return through.obj(function (file, enc, callback) {
     if (file.isStream()) {
       file.contents = file.contents.pipe(rs(search, replacement));
       return callback(null, file);
     }
 
-    const filePath = file.path.split('/');
+    const filePath = file.path.split(options.pathDivider);
     const fileName = filePath[filePath.length - 1];
     const fileDir = utils.getFileDir(filePath);
 
