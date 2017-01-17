@@ -39,7 +39,6 @@ const utils = {
 function replacement (fileContent, baseFileDir) {
   const pattern = /require\((.+)\)/ig;
   let matches;
-  // console.log(fileContent);
   while ((matches = pattern.exec(fileContent)) !== null) {
     const fileName = utils.getFileNameRequire(matches[0]);
     const filePath = baseFileDir + options.pathDivider + fileName;
