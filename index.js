@@ -44,6 +44,7 @@ function replacement (fileContent, baseFileDir) {
     const filePath = baseFileDir + options.pathDivider + fileName;
     const moduleContent = loadFile(filePath);
     fileContent = fileContent.replace(matches[0], utils.getModuleContent(moduleContent));
+    console.log('ModuleLoaded: ' + filePath + ' -> ' + baseFileDir);
   }
   return fileContent;
 }
