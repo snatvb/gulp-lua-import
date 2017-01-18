@@ -1,5 +1,5 @@
 # gulp-lua-import
-Repository: [GitHub](https://github.com/user/repo/blob/branch/other_file.md)
+Repository: [GitHub](https://github.com/snatvb/gulp-lua-import)
 
 Конфигурационный файл для сборки:
 ```sh
