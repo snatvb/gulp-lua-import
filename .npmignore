@@ -1,5 +1,5 @@
-test/*
-tests/*
-dist/*
+test/
+tests/
+dist/
 .gitignore
 gulpfile.js

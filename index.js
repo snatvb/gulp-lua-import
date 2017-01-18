@@ -40,7 +40,7 @@ function clearLineBreak(content) {
   if(!options.clear.lineBreak) {
     return content;
   }
-  const pattern = /\n{2,}/gi;
+  const pattern = /[\n\r]{2,}/gi;
   return content.replace(pattern, '\n');
 }
 
