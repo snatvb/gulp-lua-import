@@ -1,6 +1,6 @@
 {
   "name": "gulp-lua-import",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Bundle lua modules",
   "main": "index.js",
   "scripts": {
@@ -10,6 +10,10 @@
     "lua",
     "import"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/snatvb/gulp-lua-import"
+  },
   "author": "snatvb",
   "license": "ISC",
   "dependencies": {

@@ -1,4 +1,6 @@
 # gulp-lua-import
+Repository: [GitHub](https://github.com/user/repo/blob/branch/other_file.md)
+
 Конфигурационный файл для сборки:
 ```sh
 const gulp = require('gulp');
