@@ -3,6 +3,9 @@
  */
 'use strict';
 
+const utils = require('./utils');
+
+
 const through = require('through2')
   , rs = require('replacestream')
   , gutil = require('gulp-util')
@@ -18,38 +21,34 @@ function logModuleLoaded(filePath, baseFileDir) {
 
 let options = {
   log: true,
-  ignoreFolders: []
-};
-
-const utils = {
-  isModule: function (fileName) {
-    return fileName.substr(0, 8) === '_module_';
-  },
-  getFileNameRequire: function (match) {
-    let fileName = match.replace(/require\(("|')/ig, '');
-    fileName = fileName.replace(/("|')\)/gi, '');
-    if (fileName.substr(fileName.length - 4, fileName.length) !== '.lua') {
-      fileName += '.lua';
-    }
-    return fileName;
-  },
-  getModuleContent: function (moduleContent) {
-    return '(function () \n' + moduleContent + '\n end)()';
-  },
-  haveIgnoreFolder: function (parseFolder, ignoreArray) {
-    console.log(ignoreArray);
-    for (let i = 0; i < ignoreArray.length; i++) {
-      const ignoreFolder = ignoreArray[ i ];
-      for (let j = 0; j < parseFolder.length; j++) {
-        const folder = parseFolder[ j ];
-        if (folder === ignoreFolder) {
-          return true;
-        }
-      }
-    }
-    return false;
+  ignoreFolders: [],
+  clear: {
+    comments: true,
+    lineBreak: true
   }
 };
+
+function clearComments(content) {
+  if(!options.clear.comments) {
+    return content;
+  }
+  const pattern = /--(.*)+$/gim;
+  return content.replace(pattern, '');
+}
+
+function clearLineBreak(content) {
+  if(options.clear.lineBreak) {
+    return content;
+  }
+  const pattern = /\n{2,}/gim;
+  return content.replace(pattern, '\n');
+}
+
+function clearUseless(content) {
+  content = clearComments(content);
+  content = clearLineBreak(content);
+  return content;
+}
 
 function replacement(fileContent, baseFileDir, baseFileName) {
   const pattern = /require\((.+)\)/ig;
@@ -59,6 +58,7 @@ function replacement(fileContent, baseFileDir, baseFileName) {
     const filePath = path.join(baseFileDir, fileName);
     const moduleContent = loadFile(filePath);
     fileContent = fileContent.replace(matches[ 0 ], utils.getModuleContent(moduleContent));
+    fileContent = clearUseless(fileContent);
     logModuleLoaded(filePath, path.join(baseFileDir, baseFileName));
   }
   return fileContent;
@@ -73,6 +73,7 @@ function loadFile(filePath) {
 //noinspection JSUnresolvedVariable
 module.exports = function (userOptions) {
   options = Object.assign(options, userOptions);
+  options.clear = Object.assign(options.clear, userOptions && userOptions.clear);
   return through.obj(function (file, enc, callback) {
     if (file.isStream()) {
       file.contents = file.contents.pipe(rs(search, replacement));

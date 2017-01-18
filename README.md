@@ -61,8 +61,12 @@ local test = "test str"
 
 Так же можно передавать опции для сборки, такие как:
 ```
-log: true // default is true, отключаем или включаем логирование
-ignoreFolders: [] // default is empty, в массиве просто перечисляем названия папок(дирректорий), для игнора, учитывая регистр
+log : boolean // default is true, отключаем или включаем логирование
+clear : {
+    comments : boolean, // default is true, удаление комментариев в сборку
+    lineBreak: boolean // default is true, удаление лишних пересов строк
+}
+ignoreFolders : Array // default is empty, в массиве просто перечисляем названия папок(дирректорий), для игнора, учитывая регистр
 ```
 
 Пример:
