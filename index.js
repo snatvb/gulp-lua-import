@@ -37,10 +37,10 @@ function clearComments(content) {
 }
 
 function clearLineBreak(content) {
-  if(options.clear.lineBreak) {
+  if(!options.clear.lineBreak) {
     return content;
   }
-  const pattern = /\n{2,}/gim;
+  const pattern = /\n{2,}/gi;
   return content.replace(pattern, '\n');
 }
 
@@ -58,9 +58,9 @@ function replacement(fileContent, baseFileDir, baseFileName) {
     const filePath = path.join(baseFileDir, fileName);
     const moduleContent = loadFile(filePath);
     fileContent = fileContent.replace(matches[ 0 ], utils.getModuleContent(moduleContent));
-    fileContent = clearUseless(fileContent);
     logModuleLoaded(filePath, path.join(baseFileDir, baseFileName));
   }
+  fileContent = clearUseless(fileContent);
   return fileContent;
 }
 

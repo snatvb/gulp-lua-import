@@ -1,6 +1,6 @@
 {
   "name": "gulp-lua-import",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Bundle lua modules",
   "main": "index.js",
   "scripts": {
