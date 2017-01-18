@@ -7,6 +7,6 @@ const luaImport = require('./index');
 
 gulp.task('default', function () {
   return gulp.src('./test/**/*.lua')
-    .pipe(luaImport())
+    .pipe(luaImport({ignoreFolders: ['utrix']}))
     .pipe(gulp.dest('./dist'))
 });
