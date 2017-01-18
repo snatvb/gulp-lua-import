@@ -19,6 +19,7 @@ var logModuleLoaded = function (filePath, baseFileDir) {
 let options = {
   log: true
 };
+
 const utils = {
   isModule: function (fileName) {
     return fileName.substr(0,8) === '_module_';
@@ -36,22 +37,22 @@ const utils = {
   }
 };
 
-function replacement (fileContent, baseFileDir) {
+function replacement (fileContent, baseFileDir, baseFileName) {
   const pattern = /require\((.+)\)/ig;
   let matches;
   while ((matches = pattern.exec(fileContent)) !== null) {
     const fileName = utils.getFileNameRequire(matches[0]);
-    const filePath = path.join(baseFileDir, fileName)
+    const filePath = path.join(baseFileDir, fileName);
     const moduleContent = loadFile(filePath);
     fileContent = fileContent.replace(matches[0], utils.getModuleContent(moduleContent));
-    logModuleLoaded(filePath, baseFileDir);
+    logModuleLoaded(filePath, path.join(baseFileDir, baseFileName));
   }
   return fileContent;
 }
 
 function loadFile (filePath) {
   const fileContent = fs.readFileSync(filePath, "utf8");
-  return replacement(fileContent, path.parse(filePath).dir)
+  return replacement(fileContent, path.parse(filePath).dir, path.parse(filePath).base)
 }
 
 
@@ -72,7 +73,7 @@ module.exports = function (userOptions) {
     }
     if (file.isBuffer()) {
       try {
-        const content = replacement(String(file.contents), fileDir);
+        const content = replacement(String(file.contents), fileDir, fileName);
         file.contents = new Buffer(content);
       } catch (e) {
         return callback(new gutil.PluginError('gulp-lua-import', e));
