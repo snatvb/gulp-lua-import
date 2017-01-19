@@ -1,5 +1,6 @@
 --aaa
-local module = require('./_module_module')
+
+require('./_module_module')(test)
 local module2 = require('./_module_module2')
 
 

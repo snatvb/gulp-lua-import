@@ -28,36 +28,65 @@ let options = {
   }
 };
 
+/**
+ * Удаляем комментарии
+ * @param content
+ * @returns {String}
+ */
 function clearComments(content) {
-  if(!options.clear.comments) {
+  if (!options.clear.comments) {
     return content;
   }
   const pattern = /--(.*)+$/gim;
   return content.replace(pattern, '');
 }
 
+/**
+ * Очищаем лишние переносы строк
+ * @param {String} content
+ * @returns {String}
+ */
 function clearLineBreak(content) {
-  if(!options.clear.lineBreak) {
+  if (!options.clear.lineBreak) {
     return content;
   }
   const pattern = /[\n\r]{2,}/gi;
   return content.replace(pattern, '\n');
 }
 
+// Очищаем скомпилинный код
 function clearUseless(content) {
   content = clearComments(content);
   content = clearLineBreak(content);
   return content;
 }
 
+
+/**
+ * Парсим и заменяем
+ * @param {String} fileContent
+ * @param {String} baseFileDir
+ * @param {String} baseFileName
+ * @returns {String}
+ */
 function replacement(fileContent, baseFileDir, baseFileName) {
-  const pattern = /require\((.+)\)/ig;
+  const pattern = /(=)?( )*?require\((.)+\)/ig;
+  const filePattern = /\(("|')(.)+("|')\)/i;
   let matches;
+
   while ((matches = pattern.exec(fileContent)) !== null) {
-    const fileName = utils.getFileNameRequire(matches[ 0 ]);
+    const match = matches[ 0 ];
+    const fileMatch = filePattern.exec(match);
+    if (fileMatch === null) {
+      console.log(`${baseFileName} error filename match`);
+      return fileContent;
+    }
+
+    const fileName = utils.getFileNameRequire(fileMatch[ 0 ]);
     const filePath = path.join(baseFileDir, fileName);
     const moduleContent = loadFile(filePath);
-    fileContent = fileContent.replace(matches[ 0 ], utils.getModuleContent(moduleContent));
+
+    fileContent = fileContent.replace(matches[ 0 ], utils.getModuleContent(moduleContent, fileName, match));
     logModuleLoaded(filePath, path.join(baseFileDir, baseFileName));
   }
   fileContent = clearUseless(fileContent);
