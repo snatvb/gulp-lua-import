@@ -89,6 +89,7 @@ function replacement(fileContent, baseFileDir, baseFileName) {
     fileContent = fileContent.replace(matches[ 0 ], utils.getModuleContent(moduleContent, fileName, match));
     logModuleLoaded(filePath, path.join(baseFileDir, baseFileName));
   }
+
   fileContent = clearUseless(fileContent);
   return fileContent;
 }
