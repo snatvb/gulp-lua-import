@@ -70,12 +70,16 @@ function clearUseless(content) {
  * @returns {String}
  */
 function replacement(fileContent, baseFileDir, baseFileName) {
-  const pattern = /(=)?( )*?require\((.)+\)/ig;
+  const pattern = /(.)*?require\((.)+\)/ig;
   const filePattern = /\(("|')(.)+("|')\)/i;
   let matches;
 
   while ((matches = pattern.exec(fileContent)) !== null) {
     const match = matches[ 0 ];
+    if (/(--)(.)*?require/i.test(match)) {
+      continue;
+    }
+    console.log(match);
     const fileMatch = filePattern.exec(match);
     if (fileMatch === null) {
       console.log(`${baseFileName} error filename match`);

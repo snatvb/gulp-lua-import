@@ -15,9 +15,12 @@ const utils = {
     return fileName;
   },
   getVariable: function (match, fileName) {
-    const pattern = /=( )*?r/ig;
+    const pattern = /(.)*=(.)*?r/ig;
     if(pattern.test(match)) {
-      return ' = ';
+      const vname = /(.)*=/i.exec(match);
+      if(vname !== null) {
+        return `${vname[0]} `;
+      }
     }
     let variable = fileName.replace(/\//gim, '');
     variable = variable.replace(/[^-0-9a-z_]/gim, '');
@@ -25,7 +28,7 @@ const utils = {
   },
   getModuleContent: function (moduleContent, fileName, match) {
     const exception = this.getException(match);
-    const variable = this.getVariable(match, fileName)
+    const variable = this.getVariable(match, fileName);
     if (exception !== false) {
       return variable + '(function () \n'
         + 'local __RESULT__\n'
