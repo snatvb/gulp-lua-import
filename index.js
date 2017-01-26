@@ -24,7 +24,8 @@ let options = {
   ignoreFolders: [],
   clear: {
     comments: true,
-    lineBreak: true
+    lineBreak: true,
+    devModule: true
   }
 };
 
@@ -61,7 +62,6 @@ function clearUseless(content) {
   return content;
 }
 
-
 /**
  * Парсим и заменяем
  * @param {String} fileContent
@@ -72,14 +72,18 @@ function clearUseless(content) {
 function replacement(fileContent, baseFileDir, baseFileName) {
   const pattern = /(.)*?require\((.)+\)/ig;
   const filePattern = /\(("|')(.)+("|')\)/i;
+  if(options.clear.devModule) {
+    fileContent = utils.removeDevModule(fileContent);
+  }
   let matches;
 
   while ((matches = pattern.exec(fileContent)) !== null) {
     const match = matches[ 0 ];
-    if (/(--)(.)*?require/i.test(match)) {
+
+    if (utils.isComment(match)) {
       continue;
     }
-    console.log(match);
+
     const fileMatch = filePattern.exec(match);
     if (fileMatch === null) {
       console.log(`${baseFileName} error filename match`);

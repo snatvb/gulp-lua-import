@@ -60,7 +60,7 @@ const utils = {
   /**
    * Ищем обработчик исключений
    * @param {String} match
-   * @returns {String | boolean}
+   * @returns {*}
    */
   getException: function (match) {
     const exceptionPattern = /\)\((.)+\)$/i;
@@ -70,6 +70,19 @@ const utils = {
     }
     result = result[ 0 ].replace(/[()"']/gi, '');
     return result;
+  },
+  isComment: function (text) {
+    return /(--)(.)*?require/i.test(text);
+  },
+  isDev: function () {
+    return !(process.env.NODE_ENV == 'production');
+  },
+  removeDevModule: function (fileContent) {
+    if(this.isDev()) {
+      return fileContent;
+    }
+    const pattern = /(.)*?require(.*)--:dev/ig;
+    return fileContent.replace(pattern, '');
   }
 };
 
